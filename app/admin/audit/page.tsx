@@ -89,13 +89,13 @@ export default function AdminAuditPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 px-6 py-8 dark:bg-black">
+    <div className="flex flex-1 flex-col bg-slate-50 px-6 py-8 dark:bg-slate-900">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-        <h1 className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">Audit Log</h1>
+        <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-50">Audit Log</h1>
 
-        <div className="overflow-x-auto rounded-xl border border-black/[.08] bg-white dark:border-white/[.145] dark:bg-zinc-950">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800">
           <table className="w-full min-w-[760px] text-left text-sm">
-            <thead className="border-b border-black/[.08] text-xs uppercase text-zinc-500 dark:border-white/[.145] dark:text-zinc-400">
+            <thead className="border-b border-slate-200 text-xs uppercase text-slate-500 dark:border-slate-600 dark:text-slate-300">
               <tr>
                 <th className="px-4 py-3 font-medium">Action</th>
                 <th className="px-4 py-3 font-medium">Entity</th>
@@ -107,7 +107,7 @@ export default function AdminAuditPage() {
             <tbody>
               {isLoadingLogs ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-400">
+                  <td colSpan={5} className="px-4 py-6 text-center text-slate-500 dark:text-slate-300">
                     Loading...
                   </td>
                 </tr>
@@ -119,7 +119,7 @@ export default function AdminAuditPage() {
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-400">
+                  <td colSpan={5} className="px-4 py-6 text-center text-slate-500 dark:text-slate-300">
                     No audit log entries yet.
                   </td>
                 </tr>
@@ -127,21 +127,21 @@ export default function AdminAuditPage() {
                 logs.map((log) => (
                   <tr
                     key={log.id}
-                    className="border-b border-black/[.06] last:border-0 dark:border-white/[.08]"
+                    className="border-b border-slate-100 last:border-0 dark:border-slate-700"
                   >
                     <td className="px-4 py-3">
                       <StatusBadge status={log.action} />
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-zinc-700 dark:text-zinc-300">
+                    <td className="px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-300">
                       {log.entityType} / {log.entityId}
                     </td>
-                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {log.performedBy?.name ?? "Unknown"}
                     </td>
-                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {new Date(log.performedAt).toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {formatDetails(log.details)}
                     </td>
                   </tr>

@@ -183,14 +183,14 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 px-6 py-8 dark:bg-black">
+    <div className="flex flex-1 flex-col bg-slate-50 px-6 py-8 dark:bg-slate-900">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-        <h1 className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">
+        <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-50">
           Users
         </h1>
 
-        <div className="rounded-xl border border-black/[.08] bg-white p-6 dark:border-white/[.145] dark:bg-zinc-950">
-          <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">Create user</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-600 dark:bg-slate-800">
+          <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-50">Create user</h2>
 
           <form onSubmit={handleCreateUser} className="mt-4 flex flex-col gap-4">
             <ErrorBanner errors={generalErrors} />
@@ -282,14 +282,14 @@ export default function AdminUsersPage() {
           </form>
         </div>
 
-        <div className="rounded-xl border border-black/[.08] bg-white dark:border-white/[.145] dark:bg-zinc-950">
-          <div className="border-b border-black/[.08] px-6 py-4 dark:border-white/[.145]">
-            <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">All users</h2>
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800">
+          <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-600">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-50">All users</h2>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[560px] text-left text-sm">
-              <thead className="border-b border-black/[.08] text-xs uppercase text-zinc-500 dark:border-white/[.145] dark:text-zinc-400">
+              <thead className="border-b border-slate-200 text-xs uppercase text-slate-500 dark:border-slate-600 dark:text-slate-300">
                 <tr>
                   <th className="px-6 py-3 font-medium">Name</th>
                   <th className="px-6 py-3 font-medium">Email</th>
@@ -299,7 +299,7 @@ export default function AdminUsersPage() {
               <tbody>
                 {isLoadingUsers ? (
                   <tr>
-                    <td colSpan={3} className="px-6 py-6 text-center text-zinc-500 dark:text-zinc-400">
+                    <td colSpan={3} className="px-6 py-6 text-center text-slate-500 dark:text-slate-300">
                       Loading...
                     </td>
                   </tr>
@@ -311,7 +311,7 @@ export default function AdminUsersPage() {
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="px-6 py-6 text-center text-zinc-500 dark:text-zinc-400">
+                    <td colSpan={3} className="px-6 py-6 text-center text-slate-500 dark:text-slate-300">
                       No users yet.
                     </td>
                   </tr>
@@ -319,10 +319,10 @@ export default function AdminUsersPage() {
                   users.map((user) => (
                     <tr
                       key={user.id}
-                      className="border-b border-black/[.06] last:border-0 dark:border-white/[.08]"
+                      className="border-b border-slate-100 last:border-0 dark:border-slate-700"
                     >
-                      <td className="px-6 py-3 text-zinc-950 dark:text-zinc-50">{user.name}</td>
-                      <td className="px-6 py-3 text-zinc-700 dark:text-zinc-300">{user.email}</td>
+                      <td className="px-6 py-3 text-slate-800 dark:text-slate-50">{user.name}</td>
+                      <td className="px-6 py-3 text-slate-600 dark:text-slate-300">{user.email}</td>
                       <td className="px-6 py-3">
                         <select
                           value={user.role}

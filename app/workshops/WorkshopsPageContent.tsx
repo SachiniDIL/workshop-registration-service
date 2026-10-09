@@ -104,10 +104,10 @@ export default function WorkshopsPageContent() {
   const inputClass = fieldInputClass;
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 px-6 py-8 dark:bg-black">
+    <div className="flex flex-1 flex-col bg-slate-50 px-6 py-8 dark:bg-slate-900">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">
+          <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-50">
             Workshops
           </h1>
           {session?.user?.role === "manager" && (
@@ -117,9 +117,9 @@ export default function WorkshopsPageContent() {
           )}
         </div>
 
-        <div className="flex flex-wrap items-end gap-4 rounded-xl border border-black/[.08] bg-white p-4 dark:border-white/[.145] dark:bg-zinc-950">
+        <div className="flex flex-wrap items-end gap-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="from" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="from" className="text-xs font-medium text-slate-600 dark:text-slate-300">
               From
             </label>
             <input
@@ -132,7 +132,7 @@ export default function WorkshopsPageContent() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="to" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="to" className="text-xs font-medium text-slate-600 dark:text-slate-300">
               To
             </label>
             <input
@@ -145,7 +145,7 @@ export default function WorkshopsPageContent() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="status" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="status" className="text-xs font-medium text-slate-600 dark:text-slate-300">
               Status
             </label>
             <select
@@ -163,13 +163,13 @@ export default function WorkshopsPageContent() {
             </select>
           </div>
 
-          <label htmlFor="hasSeats" className="flex items-center gap-2 pb-2 text-sm text-zinc-700 dark:text-zinc-300">
+          <label htmlFor="hasSeats" className="flex items-center gap-2 pb-2 text-sm text-slate-600 dark:text-slate-300">
             <input
               id="hasSeats"
               type="checkbox"
               checked={hasSeats}
               onChange={(e) => updateParam("hasSeats", e.target.checked ? "true" : null)}
-              className="h-4 w-4 rounded border-black/[.2] dark:border-white/[.3]"
+              className="h-4 w-4 rounded border-slate-300 dark:border-slate-500"
             />
             Has seats available
           </label>
@@ -177,9 +177,9 @@ export default function WorkshopsPageContent() {
 
         {error && <InlineError>{error}</InlineError>}
 
-        <div className="overflow-x-auto rounded-xl border border-black/[.08] bg-white dark:border-white/[.145] dark:bg-zinc-950">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800">
           <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="border-b border-black/[.08] text-xs uppercase text-zinc-500 dark:border-white/[.145] dark:text-zinc-400">
+            <thead className="border-b border-slate-200 text-xs uppercase text-slate-500 dark:border-slate-600 dark:text-slate-300">
               <tr>
                 <th className="px-4 py-3 font-medium">Code</th>
                 <th className="px-4 py-3 font-medium">Title</th>
@@ -192,13 +192,13 @@ export default function WorkshopsPageContent() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-400">
+                  <td colSpan={6} className="px-4 py-6 text-center text-slate-500 dark:text-slate-300">
                     Loading...
                   </td>
                 </tr>
               ) : workshops.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-400">
+                  <td colSpan={6} className="px-4 py-6 text-center text-slate-500 dark:text-slate-300">
                     No workshops found.
                   </td>
                 </tr>
@@ -206,26 +206,26 @@ export default function WorkshopsPageContent() {
                 workshops.map((workshop) => (
                   <tr
                     key={workshop.id}
-                    className="border-b border-black/[.06] last:border-0 hover:bg-zinc-50 dark:border-white/[.08] dark:hover:bg-zinc-900"
+                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700"
                   >
-                    <td className="px-4 py-3 font-mono text-xs text-zinc-700 dark:text-zinc-300">
+                    <td className="px-4 py-3 font-mono text-xs text-slate-600 dark:text-slate-300">
                       <Link href={`/workshops/${workshop.id}`} className="hover:underline">
                         {workshop.code}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-zinc-950 dark:text-zinc-50">
+                    <td className="px-4 py-3 text-slate-800 dark:text-slate-50">
                       <Link href={`/workshops/${workshop.id}`} className="hover:underline">
                         {workshop.title}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{workshop.instructor}</td>
-                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{workshop.instructor}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {new Date(workshop.dateTime).toLocaleString()}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={workshop.status} />
                     </td>
-                    <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {workshop.seatsAvailable}/{workshop.capacity}
                     </td>
                   </tr>

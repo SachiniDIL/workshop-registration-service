@@ -106,9 +106,9 @@ export default function EditWorkshopPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 px-6 py-8 dark:bg-black">
+    <div className="flex flex-1 flex-col bg-slate-50 px-6 py-8 dark:bg-slate-900">
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-        <h1 className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">
+        <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-50">
           Edit Workshop
         </h1>
         <WorkshopForm mode="edit" initialValues={initialValues} onSubmit={handleSubmit} />

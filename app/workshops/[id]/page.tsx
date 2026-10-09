@@ -216,22 +216,22 @@ export default function WorkshopDetailPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 px-6 py-8 dark:bg-black">
+    <div className="flex flex-1 flex-col bg-slate-50 px-6 py-8 dark:bg-slate-900">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
         <div>
           <Link
             href="/workshops"
-            className="text-sm text-zinc-500 hover:underline dark:text-zinc-400"
+            className="text-sm text-slate-500 hover:underline dark:text-slate-300"
           >
             &larr; Back to workshops
           </Link>
         </div>
 
-        <div className="rounded-xl border border-black/[.08] bg-white p-6 dark:border-white/[.145] dark:bg-zinc-950">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-600 dark:bg-slate-800">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-mono text-xs text-zinc-500 dark:text-zinc-400">{workshop.code}</p>
-              <h1 className="mt-1 text-xl font-semibold text-zinc-950 dark:text-zinc-50">
+              <p className="font-mono text-xs text-slate-500 dark:text-slate-300">{workshop.code}</p>
+              <h1 className="mt-1 text-xl font-semibold text-slate-800 dark:text-slate-50">
                 {workshop.title}
               </h1>
             </div>
@@ -240,39 +240,39 @@ export default function WorkshopDetailPage() {
 
           <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
             <div className="flex justify-between sm:block">
-              <dt className="text-zinc-500 dark:text-zinc-400">Instructor</dt>
-              <dd className="text-zinc-950 dark:text-zinc-50">{workshop.instructor}</dd>
+              <dt className="text-slate-500 dark:text-slate-300">Instructor</dt>
+              <dd className="text-slate-800 dark:text-slate-50">{workshop.instructor}</dd>
             </div>
             <div className="flex justify-between sm:block">
-              <dt className="text-zinc-500 dark:text-zinc-400">Date &amp; time</dt>
-              <dd className="text-zinc-950 dark:text-zinc-50">
+              <dt className="text-slate-500 dark:text-slate-300">Date &amp; time</dt>
+              <dd className="text-slate-800 dark:text-slate-50">
                 {new Date(workshop.dateTime).toLocaleString()}
               </dd>
             </div>
             <div className="flex justify-between sm:block">
-              <dt className="text-zinc-500 dark:text-zinc-400">Capacity</dt>
-              <dd className="text-zinc-950 dark:text-zinc-50">{workshop.capacity}</dd>
+              <dt className="text-slate-500 dark:text-slate-300">Capacity</dt>
+              <dd className="text-slate-800 dark:text-slate-50">{workshop.capacity}</dd>
             </div>
             <div className="flex justify-between sm:block">
-              <dt className="text-zinc-500 dark:text-zinc-400">Seats available</dt>
-              <dd className="text-zinc-950 dark:text-zinc-50">{workshop.seatsAvailable}</dd>
+              <dt className="text-slate-500 dark:text-slate-300">Seats available</dt>
+              <dd className="text-slate-800 dark:text-slate-50">{workshop.seatsAvailable}</dd>
             </div>
             {workshop.location && (
               <div className="flex justify-between sm:block">
-                <dt className="text-zinc-500 dark:text-zinc-400">Location</dt>
-                <dd className="text-zinc-950 dark:text-zinc-50">{workshop.location}</dd>
+                <dt className="text-slate-500 dark:text-slate-300">Location</dt>
+                <dd className="text-slate-800 dark:text-slate-50">{workshop.location}</dd>
               </div>
             )}
           </dl>
 
           {workshop.description && (
-            <p className="mt-4 text-sm text-zinc-700 dark:text-zinc-300">{workshop.description}</p>
+            <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">{workshop.description}</p>
           )}
         </div>
 
         {canRegister && (
-          <div className="rounded-xl border border-black/[.08] bg-white p-6 dark:border-white/[.145] dark:bg-zinc-950">
-            <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-600 dark:bg-slate-800">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-50">
               Register an attendee
             </h2>
             <form onSubmit={handleRegister} className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end">
@@ -309,9 +309,9 @@ export default function WorkshopDetailPage() {
           </div>
         )}
 
-        <div className="rounded-xl border border-black/[.08] bg-white dark:border-white/[.145] dark:bg-zinc-950">
-          <div className="border-b border-black/[.08] px-6 py-4 dark:border-white/[.145]">
-            <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+        <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800">
+          <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-600">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-50">
               Registration history
             </h2>
           </div>
@@ -320,7 +320,7 @@ export default function WorkshopDetailPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-sm">
-              <thead className="border-b border-black/[.08] text-xs uppercase text-zinc-500 dark:border-white/[.145] dark:text-zinc-400">
+              <thead className="border-b border-slate-200 text-xs uppercase text-slate-500 dark:border-slate-600 dark:text-slate-300">
                 <tr>
                   <th className="px-6 py-3 font-medium">Attendee</th>
                   <th className="px-6 py-3 font-medium">Status</th>
@@ -334,7 +334,7 @@ export default function WorkshopDetailPage() {
                   <tr>
                     <td
                       colSpan={canRegister ? 5 : 4}
-                      className="px-6 py-6 text-center text-zinc-500 dark:text-zinc-400"
+                      className="px-6 py-6 text-center text-slate-500 dark:text-slate-300"
                     >
                       Loading...
                     </td>
@@ -352,7 +352,7 @@ export default function WorkshopDetailPage() {
                   <tr>
                     <td
                       colSpan={canRegister ? 5 : 4}
-                      className="px-6 py-6 text-center text-zinc-500 dark:text-zinc-400"
+                      className="px-6 py-6 text-center text-slate-500 dark:text-slate-300"
                     >
                       No registrations yet.
                     </td>
@@ -361,11 +361,11 @@ export default function WorkshopDetailPage() {
                   registrations.map((registration) => (
                     <tr
                       key={registration.id}
-                      className="border-b border-black/[.06] last:border-0 dark:border-white/[.08]"
+                      className="border-b border-slate-100 last:border-0 dark:border-slate-700"
                     >
                       <td className="px-6 py-3">
-                        <div className="text-zinc-950 dark:text-zinc-50">{registration.attendeeName}</div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                        <div className="text-slate-800 dark:text-slate-50">{registration.attendeeName}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-300">
                           {registration.attendeeEmail}
                         </div>
                       </td>
@@ -375,24 +375,24 @@ export default function WorkshopDetailPage() {
                           tone={registration.status === "active" ? "positive" : "neutral"}
                         />
                       </td>
-                      <td className="px-6 py-3 text-zinc-700 dark:text-zinc-300">
+                      <td className="px-6 py-3 text-slate-600 dark:text-slate-300">
                         <div>{registration.registeredBy?.name ?? "Unknown"}</div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                        <div className="text-xs text-slate-500 dark:text-slate-300">
                           {new Date(registration.registeredAt).toLocaleString()}
                         </div>
                       </td>
-                      <td className="px-6 py-3 text-zinc-700 dark:text-zinc-300">
+                      <td className="px-6 py-3 text-slate-600 dark:text-slate-300">
                         {registration.status === "cancelled" ? (
                           <>
                             <div>{registration.cancelledBy?.name ?? "Unknown"}</div>
-                            <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                            <div className="text-xs text-slate-500 dark:text-slate-300">
                               {registration.cancelledAt
                                 ? new Date(registration.cancelledAt).toLocaleString()
                                 : ""}
                             </div>
                           </>
                         ) : (
-                          <span className="text-zinc-400 dark:text-zinc-600">—</span>
+                          <span className="text-slate-400 dark:text-slate-500">—</span>
                         )}
                       </td>
                       {canRegister && (
