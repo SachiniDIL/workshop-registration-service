@@ -101,7 +101,7 @@ async function seed() {
     createdBy: admin._id,
   });
 
-  const cloudDeployment = await Workshop.create({
+  await Workshop.create({
     code: "WS-104",
     title: "Cloud Deployment with Docker",
     instructor: "Dinesh Kumar",
