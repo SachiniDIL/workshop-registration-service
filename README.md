@@ -73,3 +73,9 @@ npm run test:concurrency
 ```
 
 Expected output: exactly **1** request succeeds (`201`) and the other **4** are rejected (`409`). See [DESIGN.md](./DESIGN.md) for why this is guaranteed rather than merely likely.
+
+## CI/CD
+
+- **CI**: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and pull request to `main` — type-check (`npm run typecheck`) then lint (`npm run lint`). No env vars needed: neither step touches the database or auth config.
+- **CD**: deployment is handled by [Vercel's GitHub integration](https://workshop-registration-service-sable.vercel.app/) — every push to `main` auto-deploys, and PRs get their own preview deployment, including the production build itself. There's no separate build/deploy step in the GitHub Actions workflow to avoid duplicating Vercel's own pipeline.
+- A pre-commit hook (via Husky, see [.husky/pre-commit](.husky/pre-commit)) already runs lint-staged + a full type-check locally before each commit, so CI is mostly a second, from-clean-checkout confirmation of the same checks.
