@@ -67,7 +67,7 @@ export default function WorkshopDetailPage() {
 
   const fetchWorkshop = useCallback(async () => {
     setIsLoadingWorkshop(true);
-    const res = await fetch(`/api/workshops/${id}`);
+    const res = await fetch(`/api/workshops/${id}`, { cache: "no-store" });
     const body = await res.json().catch(() => null);
 
     if (!res.ok) {
@@ -84,7 +84,7 @@ export default function WorkshopDetailPage() {
 
   const fetchRegistrations = useCallback(async () => {
     setIsLoadingRegistrations(true);
-    const res = await fetch(`/api/registrations?workshopId=${id}`);
+    const res = await fetch(`/api/registrations?workshopId=${id}`, { cache: "no-store" });
     const body = await res.json().catch(() => null);
 
     if (!res.ok) {
@@ -112,8 +112,8 @@ export default function WorkshopDetailPage() {
       setIsLoadingRegistrations(true);
 
       const [workshopRes, registrationsRes] = await Promise.all([
-        fetch(`/api/workshops/${id}`),
-        fetch(`/api/registrations?workshopId=${id}`),
+        fetch(`/api/workshops/${id}`, { cache: "no-store" }),
+        fetch(`/api/registrations?workshopId=${id}`, { cache: "no-store" }),
       ]);
       const [workshopBody, registrationsBody] = await Promise.all([
         workshopRes.json().catch(() => null),

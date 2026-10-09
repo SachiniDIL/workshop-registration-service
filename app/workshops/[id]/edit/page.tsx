@@ -25,7 +25,7 @@ export default function EditWorkshopPage() {
     let cancelled = false;
 
     async function loadWorkshop() {
-      const res = await fetch(`/api/workshops/${id}`);
+      const res = await fetch(`/api/workshops/${id}`, { cache: "no-store" });
       const body = await res.json().catch(() => null);
 
       if (cancelled) return;

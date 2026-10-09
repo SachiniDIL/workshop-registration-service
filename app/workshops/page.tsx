@@ -71,7 +71,7 @@ export default function WorkshopsPage() {
       setIsLoading(true);
       setError(null);
 
-      const res = await fetch(`/api/workshops?${searchParams.toString()}`);
+      const res = await fetch(`/api/workshops?${searchParams.toString()}`, { cache: "no-store" });
       const body = await res.json().catch(() => null);
 
       if (cancelled) return;
