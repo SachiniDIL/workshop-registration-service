@@ -1,5 +1,7 @@
 # Workshop Registration Service
 
+[Live deployment](https://workshop-registration-service-sable.vercel.app/)
+
 A Next.js (App Router) + TypeScript app for managing workshops and attendee registrations, with role-based access for Admins, Managers, and Staff. There is no public signup — the first Admin account is seeded, and Admins create every other account.
 
 ## Prerequisites
