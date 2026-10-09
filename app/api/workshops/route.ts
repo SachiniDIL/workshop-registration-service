@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { Workshop, type IWorkshop } from "@/models/Workshop";
-import { validateCreateWorkshop } from "@/lib/validation";
+import { validateCreateWorkshop, WORKSHOP_STATUSES, type WorkshopStatus } from "@/lib/validation";
 import { unauthorizedResponse } from "@/lib/apiAuth";
+import type { QueryFilter } from "mongoose";
 
 function toWorkshopResponse(workshop: IWorkshop) {
   return {
@@ -58,15 +59,66 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(toWorkshopResponse(workshop), { status: 201 });
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const check = await requireRole(["admin", "manager", "staff"]);
   if (!check.ok) {
     return unauthorizedResponse(check.status);
   }
 
+  const params = request.nextUrl.searchParams;
+  const fromParam = params.get("from");
+  const toParam = params.get("to");
+  const statusParam = params.get("status");
+  const hasSeatsParam = params.get("hasSeats");
+
+  const errors: string[] = [];
+  const filter: QueryFilter<IWorkshop> = {};
+
+  if (fromParam !== null || toParam !== null) {
+    const dateRange: Record<string, Date> = {};
+
+    if (fromParam !== null) {
+      const from = new Date(fromParam);
+      if (Number.isNaN(from.getTime())) {
+        errors.push("from must be a valid, parseable date string");
+      } else {
+        dateRange.$gte = from;
+      }
+    }
+
+    if (toParam !== null) {
+      const to = new Date(toParam);
+      if (Number.isNaN(to.getTime())) {
+        errors.push("to must be a valid, parseable date string");
+      } else {
+        dateRange.$lte = to;
+      }
+    }
+
+    if (Object.keys(dateRange).length > 0) {
+      filter.dateTime = dateRange;
+    }
+  }
+
+  if (statusParam !== null) {
+    if (!WORKSHOP_STATUSES.includes(statusParam as WorkshopStatus)) {
+      errors.push(`status must be one of: ${WORKSHOP_STATUSES.join(", ")}`);
+    } else {
+      filter.status = statusParam as WorkshopStatus;
+    }
+  }
+
+  if (errors.length > 0) {
+    return NextResponse.json({ errors }, { status: 400 });
+  }
+
+  if (hasSeatsParam === "true") {
+    filter.$expr = { $lt: ["$activeCount", "$capacity"] };
+  }
+
   await connectToDatabase();
 
-  const workshops = await Workshop.find().sort({ dateTime: 1 });
+  const workshops = await Workshop.find(filter).sort({ dateTime: 1 });
 
   return NextResponse.json(workshops.map(toWorkshopResponse), { status: 200 });
 }
