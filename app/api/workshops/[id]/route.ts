@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { Workshop, type IWorkshop } from "@/models/Workshop";
+import { AuditLog } from "@/models/AuditLog";
 import { validateUpdateWorkshop } from "@/lib/validation";
 import { unauthorizedResponse } from "@/lib/apiAuth";
 
@@ -46,16 +47,71 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   const { data } = result;
-  if (data.code !== undefined) workshop.code = data.code;
-  if (data.title !== undefined) workshop.title = data.title;
-  if (data.instructor !== undefined) workshop.instructor = data.instructor;
-  if (data.dateTime !== undefined) workshop.dateTime = data.dateTime;
-  if (data.capacity !== undefined) workshop.capacity = data.capacity;
-  if (data.status !== undefined) workshop.status = data.status;
-  if (data.location !== undefined) workshop.location = data.location;
-  if (data.description !== undefined) workshop.description = data.description;
+  const before: Record<string, unknown> = {};
+  const after: Record<string, unknown> = {};
+
+  if (data.code !== undefined && data.code !== workshop.code) {
+    before.code = workshop.code;
+    after.code = data.code;
+    workshop.code = data.code;
+  }
+  if (data.title !== undefined && data.title !== workshop.title) {
+    before.title = workshop.title;
+    after.title = data.title;
+    workshop.title = data.title;
+  }
+  if (data.instructor !== undefined && data.instructor !== workshop.instructor) {
+    before.instructor = workshop.instructor;
+    after.instructor = data.instructor;
+    workshop.instructor = data.instructor;
+  }
+  // Compared at minute granularity: the edit form's <input type="datetime-local"> can only
+  // express minutes, so a round-trip through it always drops seconds/ms — comparing exact
+  // getTime() would register that precision loss as a change even when the user never
+  // touched the date/time field.
+  if (
+    data.dateTime !== undefined &&
+    Math.floor(data.dateTime.getTime() / 60000) !== Math.floor(workshop.dateTime.getTime() / 60000)
+  ) {
+    before.dateTime = workshop.dateTime;
+    after.dateTime = data.dateTime;
+    workshop.dateTime = data.dateTime;
+  } else if (data.dateTime !== undefined) {
+    workshop.dateTime = data.dateTime;
+  }
+  if (data.capacity !== undefined && data.capacity !== workshop.capacity) {
+    before.capacity = workshop.capacity;
+    after.capacity = data.capacity;
+    workshop.capacity = data.capacity;
+  }
+  if (data.status !== undefined && data.status !== workshop.status) {
+    before.status = workshop.status;
+    after.status = data.status;
+    workshop.status = data.status;
+  }
+  if (data.location !== undefined && data.location !== workshop.location) {
+    before.location = workshop.location;
+    after.location = data.location;
+    workshop.location = data.location;
+  }
+  if (data.description !== undefined && data.description !== workshop.description) {
+    before.description = workshop.description;
+    after.description = data.description;
+    workshop.description = data.description;
+  }
 
   await workshop.save();
+
+  if (Object.keys(after).length > 0) {
+    await AuditLog.create({
+      action: "workshop.updated",
+      entityType: "workshop",
+      entityId: workshop._id,
+      performedBy: check.user.id,
+      performedAt: new Date(),
+      details: { before, after },
+    });
+  }
 
   return NextResponse.json(toWorkshopResponse(workshop), { status: 200 });
 }

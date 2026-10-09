@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { User } from "@/models/User";
+import { AuditLog } from "@/models/AuditLog";
 import { USER_ROLES, isRecord, type UserRole } from "@/lib/validation";
 import { unauthorizedResponse } from "@/lib/apiAuth";
 
@@ -81,11 +82,24 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (result.data.name !== undefined) {
     user.name = result.data.name;
   }
+
+  const previousRole = user.role;
   if (result.data.role !== undefined) {
     user.role = result.data.role;
   }
 
   await user.save();
+
+  if (result.data.role !== undefined && result.data.role !== previousRole) {
+    await AuditLog.create({
+      action: "user.role_changed",
+      entityType: "user",
+      entityId: user._id,
+      performedBy: check.user.id,
+      performedAt: new Date(),
+      details: { before: { role: previousRole }, after: { role: result.data.role } },
+    });
+  }
 
   return NextResponse.json(toUserResponse(user), { status: 200 });
 }

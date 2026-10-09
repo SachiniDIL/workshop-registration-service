@@ -5,11 +5,12 @@ import { connectToDatabase } from "../lib/db";
 import { User } from "../models/User";
 import { Workshop } from "../models/Workshop";
 import { Registration } from "../models/Registration";
+import { AuditLog } from "../models/AuditLog";
 
-const DEV_CREDENTIALS = {
-  admin: { name: "Admin User", email: "admin@workshop.test", password: "Admin1234!" },
-  manager: { name: "Manager User", email: "manager@workshop.test", password: "Manager1234!" },
-  staff: { name: "Staff User", email: "staff@workshop.test", password: "Staff1234!" },
+const ADMIN_CREDENTIALS = {
+  name: "Admin User",
+  email: "admin@workshop.test",
+  password: "Admin1234!",
 } as const;
 
 function daysFromNow(days: number): Date {
@@ -25,39 +26,22 @@ async function seed() {
 
   await connectToDatabase();
 
-  console.log("Wiping existing Users, Workshops, and Registrations...");
+  console.log("Wiping existing Users, Workshops, Registrations, and AuditLogs...");
   await Promise.all([
     User.deleteMany({}),
     Workshop.deleteMany({}),
     Registration.deleteMany({}),
+    AuditLog.deleteMany({}),
   ]);
 
-  console.log("Creating seeded users...");
-  const [adminHash, managerHash, staffHash] = await Promise.all([
-    bcrypt.hash(DEV_CREDENTIALS.admin.password, 10),
-    bcrypt.hash(DEV_CREDENTIALS.manager.password, 10),
-    bcrypt.hash(DEV_CREDENTIALS.staff.password, 10),
-  ]);
+  console.log("Creating the seeded admin user...");
+  const adminHash = await bcrypt.hash(ADMIN_CREDENTIALS.password, 10);
 
   const admin = await User.create({
-    name: DEV_CREDENTIALS.admin.name,
-    email: DEV_CREDENTIALS.admin.email,
+    name: ADMIN_CREDENTIALS.name,
+    email: ADMIN_CREDENTIALS.email,
     passwordHash: adminHash,
     role: "admin",
-  });
-
-  const manager = await User.create({
-    name: DEV_CREDENTIALS.manager.name,
-    email: DEV_CREDENTIALS.manager.email,
-    passwordHash: managerHash,
-    role: "manager",
-  });
-
-  const staff = await User.create({
-    name: DEV_CREDENTIALS.staff.name,
-    email: DEV_CREDENTIALS.staff.email,
-    passwordHash: staffHash,
-    role: "staff",
   });
 
   console.log("Creating sample workshops...");
@@ -140,6 +124,9 @@ async function seed() {
     createdBy: admin._id,
   });
 
+  // registeredBy/cancelledBy reference the seeded admin here purely as placeholder
+  // attribution for demo data — in real usage only Manager/Staff accounts (created
+  // by the Admin via /admin/users) can register or cancel attendees.
   console.log("Creating sample registrations...");
 
   await Registration.insertMany([
@@ -149,7 +136,7 @@ async function seed() {
       attendeeName: "Nadia Khan",
       attendeeEmail: "nadia.khan@example.com",
       status: "active",
-      registeredBy: manager._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-20),
     },
     {
@@ -157,7 +144,7 @@ async function seed() {
       attendeeName: "Oliver Smith",
       attendeeEmail: "oliver.smith@example.com",
       status: "active",
-      registeredBy: staff._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-19),
     },
     {
@@ -165,9 +152,9 @@ async function seed() {
       attendeeName: "Priya Raman",
       attendeeEmail: "priya.raman@example.com",
       status: "cancelled",
-      registeredBy: manager._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-21),
-      cancelledBy: manager._id,
+      cancelledBy: admin._id,
       cancelledAt: daysFromNow(-18),
     },
 
@@ -177,7 +164,7 @@ async function seed() {
       attendeeName: "Quinn Walker",
       attendeeEmail: "quinn.walker@example.com",
       status: "active",
-      registeredBy: manager._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-3),
     },
     {
@@ -185,7 +172,7 @@ async function seed() {
       attendeeName: "Ravi Gunasekara",
       attendeeEmail: "ravi.gunasekara@example.com",
       status: "active",
-      registeredBy: staff._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-3),
     },
     {
@@ -193,7 +180,7 @@ async function seed() {
       attendeeName: "Sana Malik",
       attendeeEmail: "sana.malik@example.com",
       status: "active",
-      registeredBy: staff._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-2),
     },
     {
@@ -201,7 +188,7 @@ async function seed() {
       attendeeName: "Tharindu Bandara",
       attendeeEmail: "tharindu.bandara@example.com",
       status: "active",
-      registeredBy: manager._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-1),
     },
     {
@@ -209,9 +196,9 @@ async function seed() {
       attendeeName: "Uma Devi",
       attendeeEmail: "uma.devi@example.com",
       status: "cancelled",
-      registeredBy: staff._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-4),
-      cancelledBy: staff._id,
+      cancelledBy: admin._id,
       cancelledAt: daysFromNow(-2),
     },
 
@@ -221,7 +208,7 @@ async function seed() {
       attendeeName: "Victor Alvarez",
       attendeeEmail: "victor.alvarez@example.com",
       status: "active",
-      registeredBy: manager._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-1),
     },
     {
@@ -229,7 +216,7 @@ async function seed() {
       attendeeName: "Wendy Zhao",
       attendeeEmail: "wendy.zhao@example.com",
       status: "active",
-      registeredBy: staff._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-1),
     },
     {
@@ -237,7 +224,7 @@ async function seed() {
       attendeeName: "Xavier Rodrigo",
       attendeeEmail: "xavier.rodrigo@example.com",
       status: "active",
-      registeredBy: manager._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(0),
     },
 
@@ -247,7 +234,7 @@ async function seed() {
       attendeeName: "Yasmin Haddad",
       attendeeEmail: "yasmin.haddad@example.com",
       status: "cancelled",
-      registeredBy: manager._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-32),
       cancelledBy: admin._id,
       cancelledAt: daysFromNow(-30),
@@ -259,16 +246,15 @@ async function seed() {
       attendeeName: "Zane Mitchell",
       attendeeEmail: "zane.mitchell@example.com",
       status: "active",
-      registeredBy: staff._id,
+      registeredBy: admin._id,
       registeredAt: daysFromNow(-1),
     },
   ]);
 
   console.log("\nSeed complete. Dev login credentials:\n");
-  console.log(`  Admin   -> email: ${DEV_CREDENTIALS.admin.email}   password: ${DEV_CREDENTIALS.admin.password}`);
-  console.log(`  Manager -> email: ${DEV_CREDENTIALS.manager.email} password: ${DEV_CREDENTIALS.manager.password}`);
-  console.log(`  Staff   -> email: ${DEV_CREDENTIALS.staff.email}   password: ${DEV_CREDENTIALS.staff.password}`);
-  console.log("");
+  console.log(`  Admin -> email: ${ADMIN_CREDENTIALS.email}   password: ${ADMIN_CREDENTIALS.password}`);
+  console.log("\nNo other accounts are seeded. Log in as Admin and create Manager/Staff");
+  console.log("accounts from /admin/users to exercise those roles.\n");
 }
 
 seed()

@@ -37,6 +37,7 @@ Every mutating (and most reading) API routes call `requireRole([...])` as their 
 
 - **Registrations are never deleted, only flipped to `status: "cancelled"`**, recording `cancelledBy`/`cancelledAt`. This preserves who registered and who cancelled, and when, rather than losing that history.
 - **`activeCount` is a denormalized counter on `Workshop`**, updated atomically alongside registration/cancellation, instead of counting active `Registration` documents on every read. This keeps `GET /api/workshops` cheap, and — more importantly — it's the exact field the atomic capacity check compares against; counting live on each request would reintroduce the race this design exists to avoid.
+- **A dedicated `AuditLog` collection** (`action`, `entityType`, `entityId`, `performedBy`, `performedAt`, `details`) records workshop edits and user role changes, viewable at `/admin/audit`. Writes only fire when a field actually changed value (diffed against the existing document before saving), so a no-op `PATCH` doesn't pollute the log, and `details` stores a `{before, after}` pair per changed field rather than the whole document.
 
 ## Trade-offs and assumptions
 
@@ -47,4 +48,4 @@ Every mutating (and most reading) API routes call `requireRole([...])` as their 
 ## What was skipped, and why
 
 - **Waitlisting.** The brief's core deliverable was capacity *enforcement*, not overflow handling; a waitlist (ordering, promotion-on-cancel, notification) is a separate feature with its own race conditions, cut to keep the atomic-registration logic the focus.
-- **A separate audit-log collection.** Not built as a distinct feature, but effectively covered — `Registration` already records who/when for both registering and cancelling, and rows are never deleted. A general-purpose audit log over every entity (user/workshop edits too) was lower priority than registration integrity given the time constraint.
+- **Audit coverage beyond workshop edits and role changes.** Registration create/cancel already carry their own who/when fields (`registeredBy`/`cancelledBy`), and user creation isn't logged separately since the created user's own `createdAt` plus the admin-only `POST /api/users` gate already answer "who could have done this." Extending `AuditLog` to cover those too was judged lower value than the two mutation types most likely to need a change history.

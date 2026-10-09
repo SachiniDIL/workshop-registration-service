@@ -44,24 +44,24 @@ npm run dev
 ```
 
 - `npm install` — installs dependencies
-- `npm run seed` — connects to `MONGODB_URI`, wipes Users/Workshops/Registrations, and creates the seed data described below (refuses to run if `NODE_ENV=production`)
+- `npm run seed` — connects to `MONGODB_URI`, wipes Users/Workshops/Registrations/AuditLogs, and creates the seed data described below (refuses to run if `NODE_ENV=production`)
 - `npm run dev` — starts the dev server at [http://localhost:3000](http://localhost:3000)
 
 ## Seeded credentials
 
-After `npm run seed`, three accounts are available to log in with at `/login`:
+Per the assignment, **only one Admin account is seeded** — there is no public signup, so this is the sole entry point into the app:
 
 | Role | Email | Password |
 | --- | --- | --- |
 | Admin | `admin@workshop.test` | `Admin1234!` |
-| Manager | `manager@workshop.test` | `Manager1234!` |
-| Staff | `staff@workshop.test` | `Staff1234!` |
+
+Log in as Admin and use `/admin/users` to create Manager and Staff accounts to exercise those roles.
 
 The seed also creates 6 sample workshops (past/this-week/future, varying statuses and capacities, including one near-full and one completely full) with a mix of active and cancelled registrations attached.
 
 ## Running the concurrency test
 
-`scripts/test-concurrency.ts` is a standalone proof that the capacity-enforcement logic holds under a real race condition: it authenticates as the seeded Staff user, creates a workshop with exactly 1 seat remaining, fires 5 simultaneous `POST /api/registrations` requests at it, and reports how many succeeded vs. were rejected.
+`scripts/test-concurrency.ts` is a standalone proof that the capacity-enforcement logic holds under a real race condition. Since only an Admin account is seeded but registering requires a Manager/Staff session, the script creates its own throwaway Staff user directly in the database for the duration of the test (and deletes it again in cleanup): it authenticates as that user, creates a workshop with exactly 1 seat remaining, fires 5 simultaneous `POST /api/registrations` requests at it, and reports how many succeeded vs. were rejected.
 
 1. Make sure the dev server is running (`npm run dev` in one terminal)
 2. In another terminal:

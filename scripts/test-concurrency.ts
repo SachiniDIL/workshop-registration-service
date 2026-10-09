@@ -1,4 +1,5 @@
 import "dotenv/config";
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { connectToDatabase } from "../lib/db";
 import { User } from "../models/User";
@@ -6,11 +7,28 @@ import { Workshop } from "../models/Workshop";
 import { Registration } from "../models/Registration";
 
 const BASE_URL = process.env.TEST_BASE_URL ?? "http://localhost:3000";
-const STAFF_EMAIL = "staff@workshop.test";
-const STAFF_PASSWORD = "Staff1234!";
 const CONCURRENT_REQUESTS = 5;
 
-async function getAuthCookie(): Promise<string> {
+// Only the seeded Admin account exists out of the box (per the assignment's "only one
+// admin should be seeded" requirement). POST /api/registrations requires a Manager or
+// Staff session though, so this script creates its own throwaway Staff user directly in
+// the DB for the duration of the test and deletes it again in cleanup.
+async function createTestStaffUser(): Promise<{ email: string; password: string; userId: string }> {
+  const email = `test-staff-${Date.now()}@workshop.test`;
+  const password = "TestStaff1234!";
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  const user = await User.create({
+    name: "Concurrency Test Staff",
+    email,
+    passwordHash,
+    role: "staff",
+  });
+
+  return { email, password, userId: String(user._id) };
+}
+
+async function getAuthCookie(email: string, password: string): Promise<string> {
   const csrfRes = await fetch(`${BASE_URL}/api/auth/csrf`);
   const csrfSetCookie = csrfRes.headers.get("set-cookie") ?? "";
   const { csrfToken } = (await csrfRes.json()) as { csrfToken: string };
@@ -23,8 +41,8 @@ async function getAuthCookie(): Promise<string> {
       Cookie: csrfCookie,
     },
     body: new URLSearchParams({
-      email: STAFF_EMAIL,
-      password: STAFF_PASSWORD,
+      email,
+      password,
       csrfToken,
       json: "true",
     }),
@@ -42,16 +60,14 @@ async function getAuthCookie(): Promise<string> {
 
   if (!sessionCookie) {
     throw new Error(
-      "Failed to authenticate as staff user. Make sure the dev server is running and the DB is seeded (npm run seed)."
+      "Failed to authenticate as the test staff user. Make sure the dev server is running."
     );
   }
 
   return sessionCookie;
 }
 
-async function createNearlyFullWorkshop(): Promise<{ workshopId: string; adminId: string }> {
-  await connectToDatabase();
-
+async function createNearlyFullWorkshop(): Promise<string> {
   const admin = await User.findOne({ email: "admin@workshop.test" });
   if (!admin) {
     throw new Error("Seeded admin user not found. Run `npm run seed` first.");
@@ -72,20 +88,26 @@ async function createNearlyFullWorkshop(): Promise<{ workshopId: string; adminId
     createdBy: admin._id,
   });
 
-  return { workshopId: String(workshop._id), adminId: String(admin._id) };
+  return String(workshop._id);
 }
 
-async function cleanup(workshopId: string) {
+async function cleanup(workshopId: string, testUserId: string) {
   await Registration.deleteMany({ workshopId });
   await Workshop.deleteOne({ _id: workshopId });
+  await User.deleteOne({ _id: testUserId });
 }
 
 async function main() {
-  console.log(`Authenticating as ${STAFF_EMAIL}...`);
-  const cookie = await getAuthCookie();
+  await connectToDatabase();
+
+  console.log("Creating a throwaway Staff test user...");
+  const { email, password, userId } = await createTestStaffUser();
+
+  console.log(`Authenticating as ${email}...`);
+  const cookie = await getAuthCookie(email, password);
 
   console.log("Creating a workshop with exactly 1 seat remaining...");
-  const { workshopId } = await createNearlyFullWorkshop();
+  const workshopId = await createNearlyFullWorkshop();
   console.log(`Workshop created: ${workshopId} (capacity 5, activeCount 4, 1 seat left)`);
 
   console.log(`\nFiring ${CONCURRENT_REQUESTS} simultaneous POST /api/registrations requests...\n`);
@@ -128,8 +150,8 @@ async function main() {
   const pass = succeeded.length === 1 && conflicted.length === CONCURRENT_REQUESTS - 1;
   console.log(pass ? "\nPASS: capacity enforcement held under concurrent load.\n" : "\nFAIL: capacity was not enforced correctly.\n");
 
-  console.log("Cleaning up test workshop and registrations...");
-  await cleanup(workshopId);
+  console.log("Cleaning up test workshop, registrations, and test user...");
+  await cleanup(workshopId, userId);
 
   if (!pass) {
     process.exitCode = 1;
