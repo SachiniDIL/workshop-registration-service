@@ -7,6 +7,7 @@ import WorkshopForm, {
   type WorkshopFormValues,
   type WorkshopSubmitResult,
 } from "@/components/WorkshopForm";
+import PageMessage from "@/components/ui/PageMessage";
 
 export default function NewWorkshopPage() {
   const { data: session, status } = useSession();
@@ -43,20 +44,14 @@ export default function NewWorkshopPage() {
   }
 
   if (status === "loading") {
-    return (
-      <div className="flex flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading...</p>
-      </div>
-    );
+    return <PageMessage>Loading...</PageMessage>;
   }
 
   if (session?.user?.role !== "manager") {
     return (
-      <div className="flex flex-1 items-center justify-center bg-zinc-50 px-4 dark:bg-black">
-        <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-          You are not authorized to view this page. Only managers can create workshops.
-        </p>
-      </div>
+      <PageMessage tone="error">
+        You are not authorized to view this page. Only managers can create workshops.
+      </PageMessage>
     );
   }
 

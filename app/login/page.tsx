@@ -3,6 +3,8 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import InlineError from "@/components/ui/InlineError";
+import { fieldInputClass, fieldLabelClass, primaryButtonClass } from "@/components/ui/styles";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -44,7 +46,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="email" className={fieldLabelClass}>
               Email
             </label>
             <input
@@ -55,12 +57,12 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md border border-black/[.08] bg-transparent px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400 dark:border-white/[.145] dark:text-zinc-50"
+              className={fieldInputClass}
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label htmlFor="password" className={fieldLabelClass}>
               Password
             </label>
             <input
@@ -71,21 +73,13 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md border border-black/[.08] bg-transparent px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400 dark:border-white/[.145] dark:text-zinc-50"
+              className={fieldInputClass}
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-              {error}
-            </p>
-          )}
+          {error && <InlineError>{error}</InlineError>}
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-2 rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
-          >
+          <button type="submit" disabled={isSubmitting} className={`mt-2 ${primaryButtonClass}`}>
             {isSubmitting ? "Signing in..." : "Sign in"}
           </button>
         </form>

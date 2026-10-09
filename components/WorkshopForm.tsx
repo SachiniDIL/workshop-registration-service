@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { WORKSHOP_STATUSES, type WorkshopStatus } from "@/lib/validation";
+import ErrorBanner from "@/components/ui/ErrorBanner";
+import { fieldErrorClass, fieldInputClass, fieldLabelClass, primaryButtonClass } from "@/components/ui/styles";
 
 export interface WorkshopFormValues {
   code: string;
@@ -73,10 +75,8 @@ interface WorkshopFormProps {
   onSubmit: (values: WorkshopFormValues) => Promise<WorkshopSubmitResult>;
 }
 
-const inputClass =
-  "rounded-md border border-black/[.08] bg-transparent px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400 dark:border-white/[.145] dark:text-zinc-50";
-const labelClass = "text-sm font-medium text-zinc-700 dark:text-zinc-300";
-const fieldErrorClass = "text-xs text-red-600 dark:text-red-400";
+const inputClass = fieldInputClass;
+const labelClass = fieldLabelClass;
 
 export default function WorkshopForm({ mode, initialValues, onSubmit }: WorkshopFormProps) {
   const [values, setValues] = useState<WorkshopFormValues>(initialValues);
@@ -109,13 +109,7 @@ export default function WorkshopForm({ mode, initialValues, onSubmit }: Workshop
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {generalErrors.length > 0 && (
-        <ul className="list-disc rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-          {generalErrors.map((message) => (
-            <li key={message}>{message}</li>
-          ))}
-        </ul>
-      )}
+      <ErrorBanner errors={generalErrors} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
@@ -270,11 +264,7 @@ export default function WorkshopForm({ mode, initialValues, onSubmit }: Workshop
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="mt-2 w-fit rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
-      >
+      <button type="submit" disabled={isSubmitting} className={`mt-2 w-fit ${primaryButtonClass}`}>
         {isSubmitting
           ? mode === "create"
             ? "Creating..."

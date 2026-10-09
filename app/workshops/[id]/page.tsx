@@ -5,6 +5,10 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { WorkshopStatus } from "@/lib/validation";
+import InlineError from "@/components/ui/InlineError";
+import PageMessage from "@/components/ui/PageMessage";
+import StatusBadge from "@/components/ui/StatusBadge";
+import { fieldInputClass, fieldLabelClass, primaryButtonClass } from "@/components/ui/styles";
 
 interface Workshop {
   id: string;
@@ -39,9 +43,8 @@ interface RegistrationRecord {
   cancelledAt?: string;
 }
 
-const inputClass =
-  "rounded-md border border-black/[.08] bg-transparent px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400 dark:border-white/[.145] dark:text-zinc-50";
-const labelClass = "text-sm font-medium text-zinc-700 dark:text-zinc-300";
+const inputClass = fieldInputClass;
+const labelClass = fieldLabelClass;
 
 export default function WorkshopDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -205,21 +208,11 @@ export default function WorkshopDetailPage() {
   }
 
   if (isLoadingWorkshop) {
-    return (
-      <div className="flex flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading...</p>
-      </div>
-    );
+    return <PageMessage>Loading...</PageMessage>;
   }
 
   if (workshopError || !workshop) {
-    return (
-      <div className="flex flex-1 items-center justify-center bg-zinc-50 px-4 dark:bg-black">
-        <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-          {workshopError ?? "Workshop not found"}
-        </p>
-      </div>
-    );
+    return <PageMessage tone="error">{workshopError ?? "Workshop not found"}</PageMessage>;
   }
 
   return (
@@ -242,9 +235,7 @@ export default function WorkshopDetailPage() {
                 {workshop.title}
               </h1>
             </div>
-            <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium capitalize text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              {workshop.status}
-            </span>
+            <StatusBadge status={workshop.status} size="md" />
           </div>
 
           <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
@@ -310,19 +301,11 @@ export default function WorkshopDetailPage() {
                   required
                 />
               </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
-              >
+              <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
                 {isSubmitting ? "Registering..." : "Register"}
               </button>
             </form>
-            {formError && (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-400" role="alert">
-                {formError}
-              </p>
-            )}
+            {formError && <InlineError className="mt-3">{formError}</InlineError>}
           </div>
         )}
 
@@ -333,11 +316,7 @@ export default function WorkshopDetailPage() {
             </h2>
           </div>
 
-          {cancelError && (
-            <p className="px-6 pt-4 text-sm text-red-600 dark:text-red-400" role="alert">
-              {cancelError}
-            </p>
-          )}
+          {cancelError && <InlineError className="px-6 pt-4">{cancelError}</InlineError>}
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-sm">
@@ -391,15 +370,10 @@ export default function WorkshopDetailPage() {
                         </div>
                       </td>
                       <td className="px-6 py-3">
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
-                            registration.status === "active"
-                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                              : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
-                          }`}
-                        >
-                          {registration.status}
-                        </span>
+                        <StatusBadge
+                          status={registration.status}
+                          tone={registration.status === "active" ? "positive" : "neutral"}
+                        />
                       </td>
                       <td className="px-6 py-3 text-zinc-700 dark:text-zinc-300">
                         <div>{registration.registeredBy?.name ?? "Unknown"}</div>

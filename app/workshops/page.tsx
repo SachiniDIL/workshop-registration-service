@@ -5,6 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { WORKSHOP_STATUSES, type WorkshopStatus } from "@/lib/validation";
+import InlineError from "@/components/ui/InlineError";
+import StatusBadge from "@/components/ui/StatusBadge";
+import { fieldInputClass, primaryButtonClass } from "@/components/ui/styles";
 
 interface Workshop {
   id: string;
@@ -98,8 +101,7 @@ export default function WorkshopsPage() {
     };
   }, [searchParams]);
 
-  const inputClass =
-    "rounded-md border border-black/[.08] bg-transparent px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400 dark:border-white/[.145] dark:text-zinc-50";
+  const inputClass = fieldInputClass;
 
   return (
     <div className="flex flex-1 flex-col bg-zinc-50 px-6 py-8 dark:bg-black">
@@ -109,10 +111,7 @@ export default function WorkshopsPage() {
             Workshops
           </h1>
           {session?.user?.role === "manager" && (
-            <Link
-              href="/workshops/new"
-              className="rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
-            >
+            <Link href="/workshops/new" className={primaryButtonClass}>
               Add Workshop
             </Link>
           )}
@@ -176,11 +175,7 @@ export default function WorkshopsPage() {
           </label>
         </div>
 
-        {error && (
-          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-            {error}
-          </p>
-        )}
+        {error && <InlineError>{error}</InlineError>}
 
         <div className="overflow-x-auto rounded-xl border border-black/[.08] bg-white dark:border-white/[.145] dark:bg-zinc-950">
           <table className="w-full min-w-[720px] text-left text-sm">
@@ -228,9 +223,7 @@ export default function WorkshopsPage() {
                       {new Date(workshop.dateTime).toLocaleString()}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium capitalize text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                        {workshop.status}
-                      </span>
+                      <StatusBadge status={workshop.status} />
                     </td>
                     <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
                       {workshop.seatsAvailable}/{workshop.capacity}

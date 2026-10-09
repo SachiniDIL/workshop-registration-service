@@ -3,6 +3,9 @@
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { USER_ROLES, type UserRole } from "@/lib/validation";
+import ErrorBanner from "@/components/ui/ErrorBanner";
+import PageMessage from "@/components/ui/PageMessage";
+import { fieldErrorClass, fieldInputClass as inputClass, fieldLabelClass as labelClass, primaryButtonClass } from "@/components/ui/styles";
 
 interface UserRecord {
   id: string;
@@ -12,11 +15,6 @@ interface UserRecord {
   createdAt: string;
   updatedAt: string;
 }
-
-const inputClass =
-  "rounded-md border border-black/[.08] bg-transparent px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-400 dark:border-white/[.145] dark:text-zinc-50";
-const labelClass = "text-sm font-medium text-zinc-700 dark:text-zinc-300";
-const fieldErrorClass = "text-xs text-red-600 dark:text-red-400";
 
 const CREATE_USER_FIELDS = ["name", "email", "password", "role"] as const;
 type CreateUserField = (typeof CREATE_USER_FIELDS)[number];
@@ -173,20 +171,14 @@ export default function AdminUsersPage() {
   }
 
   if (status === "loading") {
-    return (
-      <div className="flex flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading...</p>
-      </div>
-    );
+    return <PageMessage>Loading...</PageMessage>;
   }
 
   if (!isAuthorized) {
     return (
-      <div className="flex flex-1 items-center justify-center bg-zinc-50 px-4 dark:bg-black">
-        <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-          You are not authorized to view this page. Only admins can manage users.
-        </p>
-      </div>
+      <PageMessage tone="error">
+        You are not authorized to view this page. Only admins can manage users.
+      </PageMessage>
     );
   }
 
@@ -201,13 +193,7 @@ export default function AdminUsersPage() {
           <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">Create user</h2>
 
           <form onSubmit={handleCreateUser} className="mt-4 flex flex-col gap-4">
-            {generalErrors.length > 0 && (
-              <ul className="list-disc rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-                {generalErrors.map((message) => (
-                  <li key={message}>{message}</li>
-                ))}
-              </ul>
-            )}
+            <ErrorBanner errors={generalErrors} />
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
@@ -290,11 +276,7 @@ export default function AdminUsersPage() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="mt-2 w-fit rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
-            >
+            <button type="submit" disabled={isSubmitting} className={`mt-2 w-fit ${primaryButtonClass}`}>
               {isSubmitting ? "Creating..." : "Create user"}
             </button>
           </form>
