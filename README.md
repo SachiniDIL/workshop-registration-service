@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Workshop Registration Service
 
-## Getting Started
+A Next.js (App Router) + TypeScript app for managing workshops and attendee registrations, with role-based access for Admins, Managers, and Staff. There is no public signup — the first Admin account is seeded, and Admins create every other account.
 
-First, run the development server:
+## Prerequisites
+
+- **Node.js 20.9 or later** (required by Next.js 16)
+- **MongoDB** — either:
+  - A free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) cluster, or
+  - A local MongoDB instance (`mongodb://localhost:27017/...`)
+
+## Environment setup
+
+Copy the example file and fill in the values:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env` needs three variables:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Description |
+| --- | --- |
+| `MONGODB_URI` | Your MongoDB connection string, e.g. `mongodb+srv://user:pass@cluster.mongodb.net/workshop-registration` (Atlas) or `mongodb://localhost:27017/workshop-registration` (local) |
+| `NEXTAUTH_SECRET` | A random secret NextAuth uses to sign session tokens |
+| `NEXTAUTH_URL` | The app's base URL in this environment, e.g. `http://localhost:3000` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Generating `NEXTAUTH_SECRET`:**
 
-## Learn More
+```bash
+openssl rand -base64 32
+```
 
-To learn more about Next.js, take a look at the following resources:
+(No `openssl`? Any sufficiently random 32+ byte string works, e.g. `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`.)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Install and run
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run these in order:
 
-## Deploy on Vercel
+```bash
+npm install
+npm run seed
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm install` — installs dependencies
+- `npm run seed` — connects to `MONGODB_URI`, wipes Users/Workshops/Registrations, and creates the seed data described below (refuses to run if `NODE_ENV=production`)
+- `npm run dev` — starts the dev server at [http://localhost:3000](http://localhost:3000)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Seeded credentials
+
+After `npm run seed`, three accounts are available to log in with at `/login`:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@workshop.test` | `Admin1234!` |
+| Manager | `manager@workshop.test` | `Manager1234!` |
+| Staff | `staff@workshop.test` | `Staff1234!` |
+
+The seed also creates 6 sample workshops (past/this-week/future, varying statuses and capacities, including one near-full and one completely full) with a mix of active and cancelled registrations attached.
+
+## Running the concurrency test
+
+`scripts/test-concurrency.ts` is a standalone proof that the capacity-enforcement logic holds under a real race condition: it authenticates as the seeded Staff user, creates a workshop with exactly 1 seat remaining, fires 5 simultaneous `POST /api/registrations` requests at it, and reports how many succeeded vs. were rejected.
+
+1. Make sure the dev server is running (`npm run dev` in one terminal)
+2. In another terminal:
+
+```bash
+npm run test:concurrency
+```
+
+Expected output: exactly **1** request succeeds (`201`) and the other **4** are rejected (`409`). See [DESIGN.md](./DESIGN.md) for why this is guaranteed rather than merely likely.
