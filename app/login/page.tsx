@@ -1,10 +1,21 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import InlineError from "@/components/ui/InlineError";
 import { fieldInputClass, fieldLabelClass, primaryButtonClass } from "@/components/ui/styles";
+
+function landingPageForRole(role: string | undefined): string {
+  switch (role) {
+    case "admin":
+      return "/admin/users";
+    case "manager":
+    case "staff":
+    default:
+      return "/workshops";
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,7 +42,8 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/workshops");
+    const session = await getSession();
+    router.push(landingPageForRole(session?.user?.role));
   }
 
   return (
